@@ -1,8 +1,8 @@
-
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import time
+
 
 # DataSet
 # import pandas as pd
@@ -10,7 +10,10 @@ import time
 
 # configure driver
 def configure_driver():
-
+    """
+    This will configure the driver to connect with the selected page.
+    :return:
+    """
     # Add additional Options to the webdriver
     chrome_options = Options()
     # add the argument and make the browser Headless.
@@ -19,8 +22,12 @@ def configure_driver():
     return driver
 
 
-# Scroll page to overcome lazylist
 def scroll_page(driver):
+    """
+    This will scroll down the page in order to activated the lazy list.
+    :param driver: Driver to create the page that will be scrapped
+    :return:
+    """
     previous_height = driver.execute_script('return document.body.scrollHeight')
     while True:
         driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
@@ -32,8 +39,12 @@ def scroll_page(driver):
             previous_height = new_height
 
 
-# This Function will get all users followers
-def get_user_followers(user):
+def get_user_followers(user) -> dict:
+    """
+    Get all followers of the user
+    :param user: Name of the user
+    :return: List of all followers of the user.
+    """
     # start the driver
     driver = configure_driver()
     # Step 1: Go to user profile
@@ -46,15 +57,15 @@ def get_user_followers(user):
     # Step 2: Create a parse tree of page sources after searching
     soup = BeautifulSoup(driver.page_source, "lxml")
 
-    # Step 3: Iteracao das tabelas
+    # Step 3: Iterate the tables
     db_user_followers = {}
     for course_page in soup.select("div.badgeList"):
         for course in course_page.select("div.userBadgeListItem"):
-            folower_div = "div.userBadgeListItem__title"
-            folower_user = course.select_one(folower_div).text.strip()
-            links = course.select_one(folower_div).find_all('a')
-            folower_user_link = [x['href'] for x in links]
-            db_user_followers["".join(folower_user_link)] = folower_user
+            follower_div = "div.userBadgeListItem__title"
+            follower_user = course.select_one(follower_div).text.strip()
+            links = course.select_one(follower_div).find_all('a')
+            follower_user_link = [x['href'] for x in links]
+            db_user_followers["".join(follower_user_link)] = follower_user
     driver.close()
     return db_user_followers
 
@@ -75,7 +86,7 @@ def get_user_track_likes(track) -> dict:
     # Step 2: Create a parse tree of page sources after searching
     soup = BeautifulSoup(driver.page_source, "lxml")
 
-    # Step 3: Iteracao das tabelas
+    # Step 3: Iterate the tables
     db_track_likes = {}
     for course_page in soup.select("div.badgeList"):
         for course in course_page.select("div.userBadgeListItem"):
@@ -88,8 +99,12 @@ def get_user_track_likes(track) -> dict:
     return db_track_likes
 
 
-# Get track list of a specific user
-def get_user_track_list(user):
+def get_user_track_list(user) -> dict:
+    """
+    Get a list of tracks produced by the user
+    :param user: Name of the user
+    :return: List of all tracks produced by the user
+    """
     driver = configure_driver()
     # Step 1: Go to user profile
     driver.get(f"https://soundcloud.com/{user}/tracks")
@@ -100,24 +115,28 @@ def get_user_track_list(user):
     # Step 2: Create a parse tree of page sources after searching
     soup = BeautifulSoup(driver.page_source, "lxml")
 
-    # Step 3: Iteracao das tabelas
+    # Step 3: Iterate the tables
     db_user_tracks = {}
     for course_page in soup.select("div.soundList"):
         for course in course_page.select("div.sound"):
             # Get Track URL
-            folower_div = "div.soundTitle__usernameTitleContainer"
-            track_links = course.select_one(folower_div).find_all('a')
-            folower_user_link = [x['href'] for x in track_links]
+            follower_div = "div.soundTitle__usernameTitleContainer"
+            track_links = course.select_one(follower_div).find_all('a')
+            follower_user_link = [x['href'] for x in track_links]
             # Get Track Name
-            track_name = course.select_one(folower_div).text.strip().split("\n")
+            track_name = course.select_one(follower_div).text.strip().split("\n")
             # Send to Dict
-            db_user_tracks[folower_user_link[1]] = track_name[5]
+            db_user_tracks[follower_user_link[1]] = track_name[5]
         driver.close()
-        return db_user_tracks
+    return db_user_tracks
 
 
-# Get all user that commented in a specific track
-def get_track_comments(track):
+def get_track_comments(track) -> dict:
+    """
+    This function will return a list of user that commented the track
+    :param track: Link of the track
+    :return: List of users that commented the selected track
+    """
     driver = configure_driver()
     # Step 1: Go to user profile
     driver.get(f"https://soundcloud.com{track}")
@@ -128,30 +147,34 @@ def get_track_comments(track):
     # Step 2: Create a parse tree of page sources after searching
     soup = BeautifulSoup(driver.page_source, "lxml")
 
-    # Step 3: Iteracao das tabelas
+    # Step 3: Iterate the tables
     db_comment_tracks = {}
     for course_page in soup.select("div.commentsList"):
         for course in course_page.select("div.commentItem"):
             # Get user comment name
-            folower_div = "div.commentItem__content a"
-            user_name = course.select_one(folower_div).text.strip()
+            follower_div = "div.commentItem__content a"
+            user_name = course.select_one(follower_div).text.strip()
             # Link do user do comment
-            folower_div = "div.commentItem__content"
-            track_links = course.select_one(folower_div).find_all('a')
-            folower_user_link = [x['href'] for x in track_links]
+            follower_div = "div.commentItem__content"
+            track_links = course.select_one(follower_div).find_all('a')
+            follower_user_link = [x['href'] for x in track_links]
             # Send to Dict
-            if folower_user_link[0] in db_comment_tracks:
-                strsplit = db_comment_tracks[folower_user_link[0]].find(",")
-                db_comment_tracks[folower_user_link[0]] = str(
-                    user_name + "," + str(int(db_comment_tracks[folower_user_link[0]][strsplit + 1:]) + 1))
+            if follower_user_link[0] in db_comment_tracks:
+                str_split = db_comment_tracks[follower_user_link[0]].find(",")
+                db_comment_tracks[follower_user_link[0]] = str(
+                    user_name + "," + str(int(db_comment_tracks[follower_user_link[0]][str_split + 1:]) + 1))
             else:
-                db_comment_tracks[folower_user_link[0]] = str(user_name + "," + "1")
+                db_comment_tracks[follower_user_link[0]] = str(user_name + "," + "1")
         driver.close()
         return db_comment_tracks
 
 
-# Get all users that reposted a specific track
-def get_track_repost(track):
+def get_track_repost(track) -> dict:
+    """
+    This function will return a list of user that reposted the track
+    :param track: Link of the track
+    :return: List of users that reposted the selected track
+    """
     driver = configure_driver()
     # Step 1: Go to user profile
     driver.get(f"https://soundcloud.com{track}/reposts")
@@ -162,22 +185,26 @@ def get_track_repost(track):
     # Step 2: Create a parse tree of page sources after searching
     soup = BeautifulSoup(driver.page_source, "lxml")
 
-    # Step 3: Iteracao das tabelas
+    # Step 3: Iterate the tables
     db_user_followers = {}
     for course_page in soup.select("div.badgeList"):
         for course in course_page.select("div.userBadgeListItem"):
             follower_div = "div.userBadgeListItem__title"
             follower_user = course.select_one(follower_div).text.strip()
             links = course.select_one(follower_div).find_all('a')
-            folower_user_link = [x['href'] for x in links]
-            db_user_followers["".join(folower_user_link)] = follower_user
+            follower_user_link = [x['href'] for x in links]
+            db_user_followers["".join(follower_user_link)] = follower_user
 
     driver.close()
     return db_user_followers
 
 
-#Get all tags of a specific track
-def get_track_tags(track):
+def get_track_tags(track) -> dict:
+    """
+    Get all tags of an specific track
+    :param track: Link of the track
+    :return: List of Tags of the track
+    """
     driver = configure_driver()
     # Step 1: Go to user profile
     driver.get(f"https://soundcloud.com{track}")
@@ -188,22 +215,26 @@ def get_track_tags(track):
     # Step 2: Create a parse tree of page sources after searching
     soup = BeautifulSoup(driver.page_source, "lxml")
 
-    # Step 3: Iteracao das tabelas
-    DB_info = {}
+    # Step 3: Iterate the tables
+    db_info = {}
     for course in soup.select("div.soundTags"):
         # Get user comment name
         div = "div.sc-tag-group"
         try:
-            Info = course.select_one(div).text.strip().replace("\n", ",")
-            DB_info[track] = Info
+            info = course.select_one(div).text.strip().replace("\n", ",")
+            db_info[track] = info
         except:
-            DB_info[track] = []
+            db_info[track] = []
     driver.close()
-    return DB_info
+    return db_info
 
 
-# Get the prevouly track reposted for a specific user
-def get_user_track_reposted(user):
+def get_user_track_reposted(user) -> dict:
+    """
+    Get all track reposted by an specific user
+    :param user: link of the user
+    :return: List of tracks reposted by the user
+    """
     driver = configure_driver()
     # Step 1: Go to user profile
     driver.get(f"https://soundcloud.com/{user}/reposts")
@@ -213,24 +244,28 @@ def get_user_track_reposted(user):
 
     # Step 2: Create a parse tree of page sources after searching
     soup = BeautifulSoup(driver.page_source, "lxml")
-    # Step 3: Iteracao das tabelas
-    DB_User_tracks = {}
+    # Step 3: Iterate the tables
+    db_user_tracks = {}
     for course_page in soup.select("div.userReposts"):
         for course in course_page.select("div.userStreamItem"):
             # Get Time
-            Folower_time = "time.relativeTime"
-            Folower_CTime = course.select_one(Folower_time)["datetime"]
+            follower_time = "time.relativeTime"
+            follower_c_time = course.select_one(follower_time)["datetime"]
             # Get Track URL
-            Folower_div = "div.soundTitle__usernameTitleContainer"
-            track_links = course.select_one(Folower_div).find_all('a')
-            Folower_User_link = [x['href'] for x in track_links]
-            DB_User_tracks[Folower_User_link[2]] = Folower_CTime
+            follower_div = "div.soundTitle__usernameTitleContainer"
+            track_links = course.select_one(follower_div).find_all('a')
+            follower_user_link = [x['href'] for x in track_links]
+            db_user_tracks[follower_user_link[2]] = follower_c_time
     driver.close()
-    return DB_User_tracks
+    return db_user_tracks
 
 
-# Get the prevouly track commented and the quantity of comments for a specific user
-def get_user_last_comments(user):
+def get_user_last_comments(user) -> dict:
+    """
+    Get the previously tracks commented and the quantity of comments for a specific user
+    :param user: Link of the user
+    :return: List of tracks commented
+    """
     driver = configure_driver()
     # Step 1: Go to user profile
     driver.get(f"https://soundcloud.com/{user}/comments")
@@ -240,23 +275,23 @@ def get_user_last_comments(user):
 
     # Step 2: Create a parse tree of page sources after searching
     soup = BeautifulSoup(driver.page_source, "lxml")
-    # Step 3: Iteracao das tabelas
-    DB_User_tracks = {}
+    # Step 3: Iterate the tables
+    db_user_tracks = {}
     for course_page in soup.select("div.userNetwork"):
-        for course in soup.select("div.commentBadge"):
+        for course in course_page.select("div.commentBadge"):
             # Get Time
-            Folower_time = "time.relativeTime"
-            Folower_CTime = course.select_one(Folower_time)["datetime"]
+            follower_time = "time.relativeTime"
+            follower_c_time = course.select_one(follower_time)["datetime"]
             # Get Track Name
-            Folower_div = "div.commentBadge__title"
-            Folower_User = course.select_one(Folower_div).text.replace("on", "\n").strip()
+            follower_div = "div.commentBadge__title"
             # Get Track link
-            links = course.select_one(Folower_div).find_all('a')
-            Folower_User_link = [x['href'] for x in links][0]
-            if not Folower_User_link in DB_User_tracks:
-                DB_User_tracks[Folower_User_link] = [1, Folower_CTime]
+            links = course.select_one(follower_div).find_all('a')
+            follower_user_link = [x['href'] for x in links][0]
+            if not follower_user_link in db_user_tracks:
+                db_user_tracks[follower_user_link] = [1, follower_c_time]
             else:
-                DB_User_tracks[Folower_User_link][0] = DB_User_tracks[Folower_User_link][0] + 1
-                DB_User_tracks[Folower_User_link].append(Folower_CTime)
+                db_user_tracks[follower_user_link][0] = db_user_tracks[follower_user_link][0] + 1
+                db_user_tracks[follower_user_link].append(follower_c_time)
     driver.close()
-    return DB_User_tracks
+
+    return db_user_tracks
