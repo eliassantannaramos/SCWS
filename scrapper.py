@@ -50,7 +50,7 @@ def get_user_followers(user) -> dict:
     # Step 1: Go to user profile
 
     driver.get(f"https://soundcloud.com/{user}/followers")
-    time.sleep(3)
+    time.sleep(1)
 
     scroll_page(driver)
 
@@ -79,7 +79,7 @@ def get_user_track_likes(track) -> dict:
     driver = configure_driver()
     # Step 1: Go to user profile
     driver.get(f"https://soundcloud.com{track}/likes")
-    time.sleep(3)
+    time.sleep(1)
 
     scroll_page(driver)
 
@@ -92,7 +92,7 @@ def get_user_track_likes(track) -> dict:
         for course in course_page.select("div.userBadgeListItem"):
             likes_div = "div.userBadgeListItem__title"
             likes_user = course.select_one(likes_div).text.strip()
-            links = course.select_one(likes_user).find_all('a')
+            links = course.select_one(likes_div).find_all('a')
             likes_user_link = [x['href'] for x in links]
             db_track_likes["".join(likes_user_link)] = likes_user
     driver.close()
@@ -108,7 +108,7 @@ def get_user_track_list(user) -> dict:
     driver = configure_driver()
     # Step 1: Go to user profile
     driver.get(f"https://soundcloud.com/{user}/tracks")
-    time.sleep(3)
+    time.sleep(1)
 
     scroll_page(driver)
 
@@ -140,7 +140,7 @@ def get_track_comments(track) -> dict:
     driver = configure_driver()
     # Step 1: Go to user profile
     driver.get(f"https://soundcloud.com{track}")
-    time.sleep(3)
+    time.sleep(1)
 
     scroll_page(driver)
 
@@ -178,7 +178,7 @@ def get_track_repost(track) -> dict:
     driver = configure_driver()
     # Step 1: Go to user profile
     driver.get(f"https://soundcloud.com{track}/reposts")
-    time.sleep(3)
+    time.sleep(1)
 
     scroll_page(driver)
 
@@ -208,7 +208,7 @@ def get_track_tags(track) -> dict:
     driver = configure_driver()
     # Step 1: Go to user profile
     driver.get(f"https://soundcloud.com{track}")
-    time.sleep(3)
+    time.sleep(1)
 
     # ScrollPage(driver)
 
@@ -238,7 +238,7 @@ def get_user_track_reposted(user) -> dict:
     driver = configure_driver()
     # Step 1: Go to user profile
     driver.get(f"https://soundcloud.com/{user}/reposts")
-    time.sleep(3)
+    time.sleep(1)
 
     scroll_page(driver)
 
@@ -269,7 +269,7 @@ def get_user_last_comments(user) -> dict:
     driver = configure_driver()
     # Step 1: Go to user profile
     driver.get(f"https://soundcloud.com/{user}/comments")
-    time.sleep(3)
+    time.sleep(1)
 
     scroll_page(driver)
 
