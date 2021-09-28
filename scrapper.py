@@ -159,12 +159,7 @@ def get_track_comments(track) -> dict:
             track_links = course.select_one(follower_div).find_all('a')
             follower_user_link = [x['href'] for x in track_links]
             # Send to Dict
-            if follower_user_link[0] in db_comment_tracks:
-                str_split = db_comment_tracks[follower_user_link[0]].find(",")
-                db_comment_tracks[follower_user_link[0]] = str(
-                    user_name + "," + str(int(db_comment_tracks[follower_user_link[0]][str_split + 1:]) + 1))
-            else:
-                db_comment_tracks[follower_user_link[0]] = str(user_name + "," + "1")
+            db_comment_tracks[follower_user_link[0]] = user_name
         driver.close()
         return db_comment_tracks
 
