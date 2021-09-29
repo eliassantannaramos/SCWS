@@ -1,3 +1,10 @@
 URLS:
-  resolve: "https://api-v2.soundcloud.com/resolve"
+  base: "https://api-v2.soundcloud.com"
+  resolve: "/resolve"
+  track: "/tracks/{track_id}"
+  track_comments: "/tracks/{track_id}/comments?threaded=1&filter_replies=0"
+  track_reposters: "/tracks/{track_id}/reposters"
+  user_tracks: "/users/{user_id}/tracks"
+
 OAuth_token: "OAuth 2-290059-193483665-XKOHwN9wuxr08w"
+client_id: "xwrCAMrX4rtC78f7OgEM1A4mk0Ipk6ED"
