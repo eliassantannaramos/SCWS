@@ -56,6 +56,8 @@ class User(BaseModel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.user_tracks_url = API_URLS["user_tracks"].format(user_id=self.id)
+        self.followers_url = API_URLS["user_followers"].format(user_id=self.id)
+        self.followings_url = API_URLS["user_followings"].format(user_id=self.id)
 
     def __str__(self):
         return self.username
@@ -66,6 +68,20 @@ class User(BaseModel):
         :return: A generator with user's Track instances
         """
         return User.get_collection(Track, self.user_tracks_url)
+
+    @property
+    def followers(self):
+        """
+        :return: A generator with user's Track instances
+        """
+        return User.get_collection(User, self.followers_url)
+
+    @property
+    def followings(self):
+        """
+        :return: A generator with user's followings instances
+        """
+        return User.get_collection(User, self.followings_url)
 
     @classmethod
     def find_user(cls, username):
