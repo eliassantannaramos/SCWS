@@ -2,7 +2,9 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import time
+import os
 
+BASE_PATH = os.path.dirname(os.path.abspath(__file__))
 
 # DataSet
 # import pandas as pd
@@ -18,7 +20,7 @@ def configure_driver():
     chrome_options = Options()
     # add the argument and make the browser Headless.
     chrome_options.add_argument("--headless")
-    driver = webdriver.Chrome(executable_path="chromedriver.exe", options=chrome_options)
+    driver = webdriver.Chrome(executable_path=os.path.join(BASE_PATH, "chromedriver.exe"), options=chrome_options)
     return driver
 
 

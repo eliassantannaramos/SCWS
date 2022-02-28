@@ -1,25 +1,27 @@
+from lib.model import User
 
-import scrapper
 
-# DataSet
-import pandas as pd
+def check_engagement(username):
 
-user = "esr-music8"
+    s_user = User.find_user(username)
+    for row in s_user.tracks:
+        print(row)
+        for r in row.reposters:
+            print(r)
+    # user_followers = s_user.followers
+    # user_tracks = s_user.tracks
 
-user_followers = scrapper.get_user_followers(user)
 
-user_tracks = scrapper.get_user_track_list(user)
+if __name__ == "__main__":
+    check_engagement('esr-music8')
+    # user = User.find_user('esr-music8')
+    # print("Username: %s" % user)
+    #
+    # print("Printing track list...")
+    # for track in user.tracks:
+    #     print(track)
+    #
+    #     for comment in track.comments:
+    #         print(comment)
 
-db_track_likes = db_track_repost = db_track_comments = {}
-for track in user_tracks:  # Get all user the likes all your tracks
-    db_track_likes[track] = scrapper.get_user_track_likes(track)
-    db_track_repost[track] = scrapper.get_track_repost(track)
-    db_track_comments[track] = scrapper.get_track_comments(track)
 
-pd.DataFrame(list(user_tracks.items()),
-             columns=["Link", "track_name"]).to_csv("user_tracks.csv", index=False)
-pd.DataFrame(list(user_followers.items()),
-             columns=["Follower_Link", "Follower"]).to_csv("user_followers.csv", index=False)
-pd.DataFrame(db_track_likes).to_csv("db_track_likes.csv", index=True)
-pd.DataFrame(db_track_repost).to_csv("db_track_repost.csv", index=True)
-pd.DataFrame(db_track_comments).to_csv("db_track_comments.csv", index=True)
